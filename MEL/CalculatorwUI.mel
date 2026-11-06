@@ -1,0 +1,236 @@
+//Math
+//UI
+//Printing Script
+
+global proc float Operation(string $op, float $arg[])
+{
+    float $result = 0;
+    if($op == "sum")
+    {
+        $result = math_sum($arg);
+    }
+    else if($op == "dif")
+    {
+        $result = math_dif($arg);
+    }
+    else if($op == "mult")
+    {
+        $result = math_mult($arg);
+    }
+    else if($op == "div")
+    {
+        $result = math_div($arg);
+    }
+    else if($op == "power")
+    {
+        $result = math_power($arg);
+    }
+    else if($op == "mean")
+    {
+        $result = math_mean($arg);
+    }
+    else if($op == "median")
+    {
+        $result = math_median($arg);
+    }
+    else
+    {
+        error("Operation not recognized");
+        return 0;
+    }
+    
+    return $result;
+}
+global proc float math_sum(float $input[])
+{
+    float $result = 0;
+    for ($i = 0; $i < size($input); $i++)
+    {
+        $result += $input[$i];
+    }
+    return $result;
+}
+
+global proc float math_dif(float $input[])
+{
+    
+    float $result = 0;
+    for ($i = 1; $i < size($input); $i++)
+    {
+        $result -= $input[$i];
+    }
+    return $result;
+}
+
+global proc float math_mult(float $input[])
+{
+    float $result = 1;
+    for ($i = 0; $i < size($input); $i++)
+    {
+        $result *= $input[$i];
+    }
+    return $result;
+}
+
+global proc float math_div(float $input[])
+{
+    float $result = $input[0];
+    for ($i = 1; $i < size($input); $i++)
+    {
+        if($input[$i] == 0)
+        {
+            error("Division by zero is not allowed.");
+            return 0;
+        }
+        $result /= $input[$i];
+    }
+    return $result;
+}
+
+global proc float math_power(float $input[])
+{
+    if (size($input) < 2)
+    {
+        error("Power function requires at least two arguments.");
+        return $input[0];
+    }
+    else
+    {
+        return pow($input[0], $input[1]);
+    }
+}
+
+global proc float math_mean(float $input[])
+{
+    if(size($input) == 0)
+    {
+        error("Mean function requires at least one argument.");
+        return 0;
+    }
+    return math_sum($input) / size($input);
+}
+
+global proc float math_median(float $input[])
+{
+    int $sortedSize = size($input);
+    if ($sortedSize == 0)
+    {
+        error("Median function requires at least one argument.");
+        return 0;
+    }
+
+    // Sort the array (result is float[] because input is float[])
+    float $sortedArray[] = `sort $input`;
+
+    if ($sortedSize % 2 == 1) // Odd number of elements
+    {
+        int $idx = int($sortedSize / 2);
+        return $sortedArray[$idx];
+    }
+    else // Even number of elements
+    {
+        int $idx = int($sortedSize / 2);
+        float $mid1 = $sortedArray[$idx - 1];
+        float $mid2 = $sortedArray[$idx];    // use $idx (not $idx/2)
+        return ($mid1 + $mid2) / 2.0;
+    }
+}
+
+global proc Kalkulate(string $funct, float $arry[])
+{
+    
+
+    print("You entered ");
+
+    for ($i = 0; $i < size($arry); $i++)
+    {
+        print($arry[$i] + " ");
+    }
+    
+    
+    print(" And you want me to find the " + $funct + "\n");
+
+    if($funct == "sum")
+    {
+        print("Sum: " + math_sum($arry) + "\n");
+    }
+    else if($funct == "dif")
+    {
+        print("Difference: " + math_dif($arry) + "\n");
+    }
+    else if($funct == "mult")
+    {
+        print("Product: " + math_mult($arry) + "\n");
+    }
+    else if($funct == "div")
+    {
+        print("Quotient: " + math_div($arry) + "\n");
+    }
+    else if($funct == "power")
+    {
+        print("Power: " + math_power($arry) + "\n");
+    }
+    else if($funct == "mean")
+    {
+        print("Mean: " + math_mean($arry) + "\n");
+    }
+    else if($funct == "median")
+    {
+        print("Median: " + math_median($arry) + "\n");
+    }
+    else if ($funct == "all")
+    {
+        print("Sum: " + math_sum($arry) + "\n");
+        print("Difference: " + math_dif($arry) + "\n");
+        print("Product: " + math_mult($arry) + "\n");
+        print("Quotient: " + math_div($arry) + "\n");
+        print("Power: " + math_power($arry) + "\n");
+        print("Mean: " + math_mean($arry) + "\n");
+        print("Median: " + math_median($arry) + "\n");
+    }
+    else
+    {
+        print("Function not recognized");
+    }
+    
+}
+
+global proc Calc()
+{
+    string $calcWindow = `window -title "Calculator" -widthHeight 300 200`;
+    gridLayout -numberOfColumns 2 -cellWidthHeight 150 30;
+
+    text -label "Operation: ";
+    textField -text "sum" operation;
+
+    text -label "Numbers: ";
+    textField -text "1,2,3" numbers;
+
+    button -label "Calculate" -command "CalcButton()";
+    text -label "Result: " result;
+
+    text -label "Operations: ";
+
+    text -label "sum, dif, mult, div, ";
+
+    text -label " ";
+
+    text -label "power, mean, median";
+
+    showWindow $calcWindow;
+
+}
+
+global proc CalcButton()
+{
+    string $opfield = `textField -query -text operation`;
+    string $numfield = `textField -query -text numbers`;
+    string $strArray[] = stringToStringArray($numfield, ",");
+    float $numArray[];
+    for ($arg in $strArray)
+    {
+        $numArray[size($numArray)] = (float)$arg;
+    }
+    float $result = Operation($opfield, $numArray);
+    text -edit -label ("Result: " + $result) result;
+}

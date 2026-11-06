@@ -1,0 +1,8 @@
+// Select the vertices you want a locator at and run this MEL script...
+
+string $vertices[] = `ls -sl -fl`;
+for($v in $vertices){
+    float $pos[] = `xform -q -ws -t $v`;
+    string $newLoc[] = `spaceLocator`;
+    setAttr ($newLoc[0]+".translate") $pos[0] $pos[1] $pos[2];
+}

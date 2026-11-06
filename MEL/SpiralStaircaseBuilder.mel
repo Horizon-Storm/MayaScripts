@@ -1,0 +1,40 @@
+// Spiral staircase builder
+global proc BuildStaircase(int $steps, float $length, float $width, float $height, float $pivotOffset, float $stepHeight, float $rotation)
+{
+    // Create a group for the staircase
+    string $group = `group -em -name "staircase_grp"`;
+
+    // Loop to create each step
+    for ($i = 0; $i < $steps; $i++)
+    {
+        // Create a step (box) and capture its name
+        string $step[] = `polyCube -w $width -h $height -d $length`;
+        string $stepName = $step[0];
+
+        // Calculate angle for this step
+        float $angle = ($rotation / $steps) * $i;
+        float $rad = $angle * 0.0174533; // Convert degrees to radians
+
+        // Calculate position in circle (X,Z)
+        float $x = sin($rad) * $pivotOffset;
+        float $z = cos($rad) * $pivotOffset;
+
+        // Y-position increases per step
+        float $y = $i * $stepHeight;
+
+        // Move and rotate the step
+        move $x $y $z $stepName;
+        rotate 0 $angle 0 $stepName;
+
+        // Parent to main group
+        parent $stepName $group;
+    }
+
+    // Optional: create central support cylinder
+    string $cyl[] = `polyCylinder -r ($width * 0.3) -h ($stepHeight * $steps)`;
+    move 0 (($stepHeight * $steps) / 2) 0 $cyl[0];
+    parent $cyl[0] $group;
+}
+
+// Example call
+BuildStaircase(20, 8, 3, 0.5, 6, 0.5, 360);

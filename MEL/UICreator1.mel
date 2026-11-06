@@ -1,0 +1,67 @@
+string $window = `window -title "RandomizeWindow" -widthHeight 300 200`;
+gridLayout -numberOfColumns 2 -cellWidthHeight 150 50;
+
+    text -label "Number of Objects";
+    intField -minValue 0 -maxValue 100 numfield;
+    text -label "x chord:" -bgc 1 0 0;
+    floatField -minValue -1000 -maxValue 1000 xfield;
+    text -label "y chord:" -bgc 0 1 0;
+    floatField -minValue -1000 -maxValue 1000 yfield;
+    text -label "z chord:" -bgc 0 0 1;
+    floatField -minValue -1000 -maxValue 1000 zfield;
+
+    checkBox -label "Randomize Offsets" randomize;
+    button -label "Create Objects" -command "createObjects()";
+
+showWindow $window;
+
+// small LCG PRNG used for jitter
+global int $__uc_seed = 424242;
+global proc float uc_randf()
+{
+    global int $__uc_seed;
+    $__uc_seed = ($__uc_seed * 1664525 + 1013904223) % 2147483647;
+    return ($__uc_seed % 1000000) / 1000000.0;
+}
+
+global proc createObjects()
+{
+    int $num = `intField -query -value numfield`;
+    float $x = `floatField -query -value xfield`;
+    float $y = `floatField -query -value yfield`;
+    float $z = `floatField -query -value zfield`;
+    string $selection[] = `ls -sl`;
+
+    if (size($selection) == 0)
+    {
+        warning "Please select at least one object to duplicate";
+        return;
+    }
+
+    int $randOn = `checkBox -query -value randomize`;
+
+    int $s;
+    int $i;
+    for ($s = 0; $s < size($selection); $s++)
+    {
+        for ($i = 0; $i < $num; $i++)
+        {
+            string $newObj[] = `duplicate $selection[$s]`;
+            float $dx = $x;
+            float $dy = $y;
+            float $dz = $z;
+            if ($randOn)
+            {
+                $dx = ($x == 0) ? 0 : ($x * 2.0 * (uc_randf() - 0.5));
+                $dy = ($y == 0) ? 0 : ($y * 2.0 * (uc_randf() - 0.5));
+                $dz = ($z == 0) ? 0 : ($z * 2.0 * (uc_randf() - 0.5));
+            }
+            xform -r -translation $dx $dy $dz $newObj[0];
+        }
+    }
+}
+
+
+//need to duplicate all selections (nested for loop)
+    //use xform instead of move
+    //add option to randomize the x,y,z values

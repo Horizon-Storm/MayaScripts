@@ -1,0 +1,22 @@
+///Automatically add a gradient of vertex colour to a mesh 
+
+string $vertices[] = `ls -sl -fl`;
+
+float $max_iterations = 5;
+float $current_iteration = $max_iterations;
+float $colour_step = 1/($max_iterations+1);
+
+for($j=0; $j<=$max_iterations; ++$j)
+{
+    for($i=0; $i<$current_iteration; ++$i)
+    {
+        select `ls -sl`;PolySelectTraverse 1;select `ls -sl`;
+    }
+
+    float $current_colour = $current_iteration * $colour_step;    
+    print ($current_colour + "\n");
+    polyColorPerVertex -r $current_colour -cdo;
+    select -cl;
+    select $vertices;
+    $current_iteration = $current_iteration - 1;
+}
