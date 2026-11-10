@@ -9,7 +9,7 @@ for sel in sels:
 
     for shape in shapes:
         cmds.setAttr("%s.overrideEnabled" % (shape), 1)
-        cmds.setAttr("%s.overrideColor" % (shape), 6)  # Change the number to the desired color index (0-31)
+        cmds.setAttr("%s.overrideColor" % (shape), 14)  # Change the number to the desired color index (0-31)
 
         #Set Specific Color Value
         #cmds.setAttr("%s.overrideColor" % (shape), r, g, b)  # r, g, b values are between 0-1

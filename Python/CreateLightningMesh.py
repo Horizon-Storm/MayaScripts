@@ -9,8 +9,10 @@ Create and deform a number of meshes and uv's for use with a scrolling UV2 mater
 
 numMeshes = 10
 
+# Number of subdivisions across each plane, and how many times to jag the edges.
 divisions = 20
-moveRepeats = 3  #more repeats results in a more jagged mesh
+# Controls the distance of each random edge offset.
+moveRepeats = 3  # More repeats result in a more jagged mesh.
 offsetfactor = 1
 
 #Loop over numMeshes
@@ -18,9 +20,11 @@ offsetfactor = 1
 for mesh in xrange(0, numMeshes):
 
     #Create Mesh and randomly move Edges
+    # Create a long, narrow plane to use as the base lightning mesh.
     
     lightningmesh = cmds.polyPlane( sx=divisions, sy=1, w=20, h=0.5)[0]
     
+    # Move alternating edges by random amounts to create a jagged shape.
     for rep in xrange(0,moveRepeats):
         for x in xrange(3,(divisions*2),2):
             offset = (random.random()-0.5)*2 * offsetfactor
@@ -29,6 +33,7 @@ for mesh in xrange(0, numMeshes):
             
             
     #Create Second UV Set
+    # Adjust the current UVs and offset them for this mesh in the sequence.
     
     cmds.select("{0}.map[:]".format(lightningmesh))
     cmds.polyEditUV(pivotV=0, scaleV=0.01)
@@ -36,12 +41,14 @@ for mesh in xrange(0, numMeshes):
     cmds.select("{0}.map[:]".format(lightningmesh))
     cmds.polyEditUV(r=1, v=mesh*(1.0/numMeshes))
 
+    # Copy the UVs into a new UV set, then normalize the UV layout.
     cmds.select('{0}'.format(lightningmesh))
     cmds.polyCopyUV(createNewMap=1)
         
     cmds.polyNormalizeUV(pa=0)
 
     #Add a Wave Deformer
+    # Add a wave deformer with randomized amplitude and wavelength.
     
     Amp = (random.random()-0.5) * 0.4
     Wavelength = random.random() + 0.5
@@ -54,6 +61,7 @@ for mesh in xrange(0, numMeshes):
     cmds.setAttr('{0}.dropoff'.format(WaveDef), 1)
     
     #Add a Twist Deformer
+    # Add a twist deformer and randomize how far it twists the mesh.
     
     TwistAngle = (random.random()-0.5)*2 * 720
     
